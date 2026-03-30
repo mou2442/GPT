@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>视听约束转译器 v0.1</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f3efe8;
+        --card: #fffdfa;
+        --text: #1f1d1a;
+        --muted: #6d665d;
+        --line: #d9d0c4;
+        --accent: #5a4734;
+        --accent-soft: #efe4d6;
+        --danger-soft: #f4e6e6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.55;
+      }
+      .wrap {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 20px 16px 40px;
+      }
+      .hero, .panel, .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(31, 29, 26, 0.05);
+      }
+      .hero { padding: 20px; margin-bottom: 16px; }
+      .hero h1, .hero p, h2, h3 { margin: 0; }
+      .hero h1 { font-size: 28px; margin-bottom: 8px; }
+      .sub { color: var(--muted); max-width: 900px; }
+      .hint { color: var(--muted); font-size: 13px; }
+      .top-actions {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      button, .file-label {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--text);
+        border-radius: 999px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font: inherit;
+      }
+      button:hover, .file-label:hover { border-color: var(--accent); }
+      .primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .ghost { background: var(--accent-soft); }
+      .danger { background: var(--danger-soft); }
+      input[type="file"] { display: none; }
+      .layout {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 1100px) {
+        .layout {
+          grid-template-columns: 360px minmax(0, 1fr);
+          align-items: start;
+        }
+      }
+      .left-stack, .right-stack { display: grid; gap: 16px; }
+      .panel { padding: 16px; }
+      .preview-box {
+        border: 1px dashed var(--line);
+        border-radius: 14px;
+        min-height: 280px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        background: #faf7f2;
+      }
+      .preview-box img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .meta-item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+      }
+      .meta-item .label { color: var(--muted); font-size: 13px; }
+      .meta-item .value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+      .columns {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 980px) {
+        .columns { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      .card { padding: 16px; }
+      .card h2 { font-size: 18px; margin-bottom: 6px; }
+      .card .desc { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+      label {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      input[type="text"], textarea, select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        padding: 10px 12px;
+        font: inherit;
+      }
+      textarea { min-height: 88px; resize: vertical; }
+      .field + .field { margin-top: 12px; }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .chip {
+        display: inline-flex;
+        padding: 6px 10px;
+        background: var(--accent-soft);
+        border-radius: 999px;
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .io-grid {
+        display: grid;
+        gap: 16px;
+      }
+      @media (min-width: 980px) {
+        .io-grid { grid-template-columns: 1.2fr 0.8fr; }
+      }
+      .code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #faf7f2;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        min-height: 280px;
+      }
+      .pack-list { display: grid; gap: 10px; }
+      .pack-item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+      }
+      .pack-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+      .pack-name { font-weight: 700; }
+      .pack-meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
+      .pack-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .small { font-size: 13px; }
+      .footer-note { margin-top: 14px; color: var(--muted); font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="hero">
+        <h1>视听约束转译器 v0.1</h1>
+        <p class="sub">静帧图片入口 + 结构包 / 运动表 / 风格约束 三栏迭代。当前版本为纯前端工作台，不做自动识别计算，重点在于把静帧母本整理成可投喂视频模型的约束文本与 JSON。</p>
+        <div class="top-actions">
+          <label class="file-label" for="imageInput">上传静帧图片</label>
+          <input id="imageInput" type="file" accept="image/*" />
+          <button id="fillDemoBtn" class="ghost">填入皮影示例</button>
+          <button id="savePackBtn" class="primary">保存为经验包</button>
+          <button id="exportJsonBtn">导出 JSON</button>
+          <button id="exportTextBtn">导出约束文本</button>
+          <button id="clearBtn" class="danger">清空当前表单</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="left-stack">
+          <section class="panel">
+            <h2>输入区</h2>
+            <p class="desc hint">当前入口吃静帧图片。多帧连续输入在下一阶段扩展。</p>
+            <div class="preview-box" id="previewBox"><span class="hint">未上传图片</span></div>
+            <div class="meta-grid">
+              <div class="meta-item"><div class="label">文件名</div><div class="value small" id="metaName">—</div></div>
+              <div class="meta-item"><div class="label">尺寸</div><div class="value" id="metaSize">—</div></div>
+              <div class="meta-item"><div class="label">比例</div><div class="value" id="metaRatio">—</div></div>
+              <div class="meta-item"><div class="label">输入模式</div><div class="value small">静帧 / 预留多帧</div></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>接口区：经验包</h2>
+            <p class="desc hint">先做成本地配置仓。用于保存可复用模板、失败修正、模型适配经验。</p>
+            <div class="field">
+              <label for="packName">经验包名称</label>
+              <input id="packName" type="text" placeholder="例如：上美影皮影_静帧到短镜头_v01" />
+            </div>
+            <div class="field">
+              <label for="packTags">标签</label>
+              <input id="packTags" type="text" placeholder="例如：皮影, 上美影, 低自由度, 静帧" />
+            </div>
+            <div class="field">
+              <label for="packNotes">经验备注</label>
+              <textarea id="packNotes" placeholder="记录成功经验、失败案例、模型适配规则。"></textarea>
+            </div>
+            <div id="packList" class="pack-list"></div>
+            <div class="footer-note">本地保存位置：浏览器 localStorage。当前不接云端数据库。</div>
+          </section>
+        </div>
+
+        <div class="right-stack">
+          <section class="columns">
+            <article class="card">
+              <h2>结构包</h2>
+              <p class="desc">描述主轮廓、结构补线、背景静层、光束层与锁定锚点。</p>
+              <div class="field"><label for="subjectLayer">主体 / 场景对象</label><input id="subjectLayer" type="text" placeholder="人物、窗框、器物、光束" /></div>
+              <div class="field"><label for="mainContour">主轮廓</label><textarea id="mainContour" placeholder="人物侧脸、肩线、袍子外缘、窗框大弧形"></textarea></div>
+              <div class="field"><label for="structuralLines">结构补线</label><textarea id="structuralLines" placeholder="鼻梁与下巴朝向、前襟折线、手势位置"></textarea></div>
+              <div class="field"><label for="backgroundStatic">背景静层</label><textarea id="backgroundStatic" placeholder="窗框、地面器物、镜框轮廓，默认尽量不动"></textarea></div>
+              <div class="field"><label for="lightAtmosphere">光 / 雾 / 反射层</label><textarea id="lightAtmosphere" placeholder="主光束斜线、雾区、亮区、反射延迟层"></textarea></div>
+              <div class="field"><label for="anchors">锚点与锁定项</label><textarea id="anchors" placeholder="头顶、鼻尖、手腕、衣摆端点；锁定站姿与抬头方向"></textarea></div>
+            </article>
+
+            <article class="card">
+              <h2>运动表</h2>
+              <p class="desc">把“物理”降维成模型更容易守规矩的运动约束。</p>
+              <div class="field"><label for="motionObjects">运动对象</label><textarea id="motionObjects" placeholder="头部、右手、衣摆、光束、反射层"></textarea></div>
+              <div class="field"><label for="keypoints">关键点</label><textarea id="keypoints" placeholder="头顶、鼻尖、手腕、肘部、衣摆端点"></textarea></div>
+              <div class="field"><label for="motionPaths">方向 / 幅度 / 节奏</label><textarea id="motionPaths" placeholder="头部 2 秒内缓慢上抬；衣摆向左轻摆后回落；光束亮度轻微呼吸"></textarea></div>
+              <div class="field"><label for="delayLocks">延迟 / 锁定 / 禁止项</label><textarea id="delayLocks" placeholder="背景静止；镜中反射延迟 2–3 帧；禁止全身大幅漂移"></textarea></div>
+              <div class="field"><label for="shotDuration">镜头时长 / 帧感</label><input id="shotDuration" type="text" placeholder="例如：3–5 秒，低帧手绘感" /></div>
+            </article>
+
+            <article class="card">
+              <h2>风格约束</h2>
+              <p class="desc">限定线条、运动逻辑、镜头节奏和禁止滤镜倾向。</p>
+              <div class="field"><label for="styleTheme">风格母题</label><input id="styleTheme" type="text" placeholder="例如：上美影皮影感 / 黑白绣像感" /></div>
+              <div class="field"><label for="styleRefs">参考流派 / 参考词</label><textarea id="styleRefs" placeholder="皮影、剪纸、上美影早期、低自由度姿态变化"></textarea></div>
+              <div class="field"><label for="lineRules">线条与造型规则</label><textarea id="lineRules" placeholder="主轮廓明确，内部细节克制，少量光束线，避免过碎纹样"></textarea></div>
+              <div class="field"><label for="motionRules">运动逻辑</label><textarea id="motionRules" placeholder="姿态变化明确，局部微动，不追求写实流体布料"></textarea></div>
+              <div class="field"><label for="forbidRules">禁用滤镜 / 禁止倾向</label><textarea id="forbidRules" placeholder="禁止统一磨皮、全局柔焦、现代 CG 塑料感、过度镜头炫技"></textarea></div>
+            </article>
+          </section>
+
+          <section class="io-grid">
+            <article class="panel">
+              <h2>JSON 输出预览</h2>
+              <p class="desc hint">这一份更适合作为中间层配置。</p>
+              <div id="jsonOutput" class="code"></div>
+            </article>
+            <article class="panel">
+              <h2>模型投喂文本</h2>
+              <p class="desc hint">这一份更接近视频模型提示，但已按约束逻辑组织。</p>
+              <div id="textOutput" class="code"></div>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const ids = [
+        'subjectLayer', 'mainContour', 'structuralLines', 'backgroundStatic', 'lightAtmosphere', 'anchors',
+        'motionObjects', 'keypoints', 'motionPaths', 'delayLocks', 'shotDuration',
+        'styleTheme', 'styleRefs', 'lineRules', 'motionRules', 'forbidRules',
+        'packName', 'packTags', 'packNotes'
+      ];
+
+      const imageState = {
+        name: '', width: '', height: '', ratio: '', dataUrl: ''
+      };
+
+      function byId(id) { return document.getElementById(id); }
+      function getValue(id) { return byId(id).value.trim(); }
+
+      function buildState() {
+        return {
+          meta: {
+            app: '视听约束转译器 v0.1',
+            input_mode: '静帧',
+            image_name: imageState.name || '',
+            image_size: imageState.width && imageState.height ? `${imageState.width} × ${imageState.height}` : '',
+            image_ratio: imageState.ratio || ''
+          },
+          structure_pack: {
+            subject: getValue('subjectLayer'),
+            main_contour: getValue('mainContour'),
+            structural_lines: getValue('structuralLines'),
+            background_static: getValue('backgroundStatic'),
+            light_atmosphere: getValue('lightAtmosphere'),
+            anchors_and_locks: getValue('anchors')
+          },
+          motion_sheet: {
+            objects: getValue('motionObjects'),
+            keypoints: getValue('keypoints'),
+            motion_paths: getValue('motionPaths'),
+            delay_locks_forbid: getValue('delayLocks'),
+            shot_duration: getValue('shotDuration')
+          },
+          style_constraints: {
+            theme: getValue('styleTheme'),
+            references: getValue('styleRefs'),
+            line_rules: getValue('lineRules'),
+            motion_rules: getValue('motionRules'),
+            forbid_rules: getValue('forbidRules')
+          },
+          experience_pack_meta: {
+            pack_name: getValue('packName'),
+            tags: getValue('packTags'),
+            notes: getValue('packNotes')
+          }
+        };
+      }
+
+      function buildPromptText(state) {
+        return [
+          '【输入母本】',
+          state.meta.image_name ? `静帧来源：${state.meta.image_name}` : '静帧来源：未命名图片',
+          state.meta.image_size ? `尺寸：${state.meta.image_size}｜比例：${state.meta.image_ratio}` : '尺寸：未记录',
+          '',
+          '【结构约束】',
+          `主体：${state.structure_pack.subject || '未填写'}`,
+          `主轮廓：${state.structure_pack.main_contour || '未填写'}`,
+          `结构补线：${state.structure_pack.structural_lines || '未填写'}`,
+          `背景静层：${state.structure_pack.background_static || '未填写'}`,
+          `光/雾/反射层：${state.structure_pack.light_atmosphere || '未填写'}`,
+          `锚点与锁定：${state.structure_pack.anchors_and_locks || '未填写'}`,
+          '',
+          '【运动约束】',
+          `对象：${state.motion_sheet.objects || '未填写'}`,
+          `关键点：${state.motion_sheet.keypoints || '未填写'}`,
+          `方向/幅度/节奏：${state.motion_sheet.motion_paths || '未填写'}`,
+          `延迟/锁定/禁止项：${state.motion_sheet.delay_locks_forbid || '未填写'}`,
+          `镜头时长：${state.motion_sheet.shot_duration || '未填写'}`,
+          '',
+          '【风格约束】',
+          `风格母题：${state.style_constraints.theme || '未填写'}`,
+          `参考流派：${state.style_constraints.references || '未填写'}`,
+          `线条规则：${state.style_constraints.line_rules || '未填写'}`,
+          `运动逻辑：${state.style_constraints.motion_rules || '未填写'}`,
+          `禁止倾向：${state.style_constraints.forbid_rules || '未填写'}`,
+          '',
+          '【执行要求】',
+          '优先保持主体轮廓与站姿稳定，背景默认静止。',
+          '允许局部微动，不追求写实流体模拟。',
+          '避免统一磨皮、全局柔焦和现代 CG 塑料感。'
+        ].join('\n');
+      }
+
+      function renderOutputs() {
+        const state = buildState();
+        byId('jsonOutput').textContent = JSON.stringify(state, null, 2);
+        byId('textOutput').textContent = buildPromptText(state);
+      }
+
+      function setMeta(name, width, height) {
+        imageState.name = name || '';
+        imageState.width = width || '';
+        imageState.height = height || '';
+        imageState.ratio = width && height ? (width / height).toFixed(3) : '';
+        byId('metaName').textContent = imageState.name || '—';
+        byId('metaSize').textContent = width && height ? `${width} × ${height}` : '—';
+        byId('metaRatio').textContent = imageState.ratio || '—';
+        renderOutputs();
+      }
+
+      function handleImage(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imageState.dataUrl = e.target.result;
+          const img = new Image();
+          img.onload = () => {
+            setMeta(file.name, img.naturalWidth, img.naturalHeight);
+            const box = byId('previewBox');
+            box.innerHTML = '';
+            box.appendChild(img);
+          };
+          img.src = imageState.dataUrl;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function downloadText(filename, content, type = 'text/plain;charset=utf-8') {
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function getPacks() {
+        try { return JSON.parse(localStorage.getItem('avConstraintPacks') || '[]'); }
+        catch { return []; }
+      }
+
+      function setPacks(packs) {
+        localStorage.setItem('avConstraintPacks', JSON.stringify(packs));
+      }
+
+      function renderPackList() {
+        const packs = getPacks();
+        const box = byId('packList');
+        if (!packs.length) {
+          box.innerHTML = '<div class="pack-item hint">当前还没有经验包。</div>';
+          return;
+        }
+        box.innerHTML = packs.map((pack, index) => `
+          <div class="pack-item">
+            <div class="pack-head">
+              <div>
+                <div class="pack-name">${pack.name || '未命名经验包'}</div>
+                <div class="pack-meta">${pack.tags || '无标签'}｜${pack.saved_at}</div>
+              </div>
+            </div>
+            <div class="pack-meta">${pack.notes || '无备注'}</div>
+            <div class="pack-actions">
+              <button data-load="${index}">载入</button>
+              <button data-export="${index}">导出</button>
+              <button data-delete="${index}" class="danger">删除</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function loadPack(pack) {
+        const state = pack.state || {};
+        const mapping = {
+          subjectLayer: state.structure_pack?.subject || '',
+          mainContour: state.structure_pack?.main_contour || '',
+          structuralLines: state.structure_pack?.structural_lines || '',
+          backgroundStatic: state.structure_pack?.background_static || '',
+          lightAtmosphere: state.structure_pack?.light_atmosphere || '',
+          anchors: state.structure_pack?.anchors_and_locks || '',
+          motionObjects: state.motion_sheet?.objects || '',
+          keypoints: state.motion_sheet?.keypoints || '',
+          motionPaths: state.motion_sheet?.motion_paths || '',
+          delayLocks: state.motion_sheet?.delay_locks_forbid || '',
+          shotDuration: state.motion_sheet?.shot_duration || '',
+          styleTheme: state.style_constraints?.theme || '',
+          styleRefs: state.style_constraints?.references || '',
+          lineRules: state.style_constraints?.line_rules || '',
+          motionRules: state.style_constraints?.motion_rules || '',
+          forbidRules: state.style_constraints?.forbid_rules || '',
+          packName: pack.name || '',
+          packTags: pack.tags || '',
+          packNotes: pack.notes || ''
+        };
+        Object.entries(mapping).forEach(([id, value]) => { byId(id).value = value; });
+        renderOutputs();
+      }
+
+      function savePack() {
+        const state = buildState();
+        const name = getValue('packName') || `经验包_${new Date().toISOString().slice(0, 10)}`;
+        const tags = getValue('packTags');
+        const notes = getValue('packNotes');
+        const packs = getPacks();
+        packs.unshift({
+          name,
+          tags,
+          notes,
+          saved_at: new Date().toLocaleString(),
+          state
+        });
+        setPacks(packs.slice(0, 20));
+        renderPackList();
+      }
+
+      function clearForm() {
+        [
+          'subjectLayer', 'mainContour', 'structuralLines', 'backgroundStatic', 'lightAtmosphere', 'anchors',
+          'motionObjects', 'keypoints', 'motionPaths', 'delayLocks', 'shotDuration',
+          'styleTheme', 'styleRefs', 'lineRules', 'motionRules', 'forbidRules',
+          'packName', 'packTags', 'packNotes'
+        ].forEach((id) => byId(id).value = '');
+        renderOutputs();
+      }
+
+      function fillDemo() {
+        const demo = {
+          subjectLayer: '立于光束中的侧身人物、右侧窗框大弧形、背景器物与主光束',
+          mainContour: '人物侧脸、额头、鼻尖、下巴、肩线、袍子外缘、右侧窗框大轮廓',
+          structuralLines: '鼻梁朝向、前襟折线、袖口、手势位置、发型分块',
+          backgroundStatic: '窗框、地面器物、背景大暗面默认静止，不追细碎纹样',
+          lightAtmosphere: '保留两到三条主光束斜线，雾区只作呼吸感，不做满屏流体',
+          anchors: '头顶、鼻尖、手腕、衣摆端点；锁定站姿与抬头方向',
+          motionObjects: '头部、右手、衣摆、光束、镜中反射层',
+          keypoints: '头顶、鼻尖、下巴、手腕、衣摆端点',
+          motionPaths: '头部 2 秒内缓慢上抬；右手微提后停；衣摆向左轻摆后回落；光束亮度轻微呼吸',
+          delayLocks: '背景静止；镜中反射延迟 2–3 帧；禁止全身漂移和镜头乱晃',
+          shotDuration: '3–5 秒，低帧手绘感，姿态变化明确',
+          styleTheme: '上美影皮影感',
+          styleRefs: '皮影、剪纸、早期上美影、低自由度姿态变化',
+          lineRules: '主轮廓明确，内部细节克制，少量光束线，避免过碎和现代磨皮感',
+          motionRules: '局部微动，大形稳定，不做写实流体布料与头发解算',
+          forbidRules: '禁止统一磨皮、全局柔焦、塑料质感 CG、过度镜头炫技',
+          packName: '上美影皮影_静帧短镜头_v01',
+          packTags: '皮影, 上美影, 低自由度, 静帧',
+          packNotes: '适合先测试 3–5 秒短段，不适合一步到位做完整长镜头。'
+        };
+        Object.entries(demo).forEach(([id, value]) => byId(id).value = value);
+        renderOutputs();
+      }
+
+      document.getElementById('imageInput').addEventListener('change', (event) => {
+        const file = event.target.files?.[0];
+        if (file) handleImage(file);
+      });
+
+      ids.forEach((id) => byId(id).addEventListener('input', renderOutputs));
+
+      byId('fillDemoBtn').addEventListener('click', fillDemo);
+      byId('savePackBtn').addEventListener('click', savePack);
+      byId('clearBtn').addEventListener('click', clearForm);
+      byId('exportJsonBtn').addEventListener('click', () => {
+        downloadText('av-constraint-translator_v0.1.json', JSON.stringify(buildState(), null, 2), 'application/json;charset=utf-8');
+      });
+      byId('exportTextBtn').addEventListener('click', () => {
+        downloadText('av-constraint-translator_v0.1.txt', buildPromptText(buildState()));
+      });
+
+      byId('packList').addEventListener('click', (event) => {
+        const target = event.target;
+        const packs = getPacks();
+        if (target.matches('[data-load]')) {
+          loadPack(packs[Number(target.getAttribute('data-load'))]);
+        }
+        if (target.matches('[data-export]')) {
+          const pack = packs[Number(target.getAttribute('data-export'))];
+          downloadText(`${(pack.name || '经验包').replace(/\s+/g, '_')}.json`, JSON.stringify(pack, null, 2), 'application/json;charset=utf-8');
+        }
+        if (target.matches('[data-delete]')) {
+          packs.splice(Number(target.getAttribute('data-delete')), 1);
+          setPacks(packs);
+          renderPackList();
+        }
+      });
+
+      renderOutputs();
+      renderPackList();
+    </script>
+  </body>
+</html>
