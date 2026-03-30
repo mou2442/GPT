@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>供电系统 v0.1</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">LOW POWER / STILL RUNNING</p>
+        <h1>供电系统 v0.1</h1>
+        <p class="lede">
+          不是待办清单，也不是恢复程序。它是低电量运行时的外接电源面板。
+        </p>
+      </header>
+
+      <section class="status-panel card">
+        <div>
+          <h2>当前协议</h2>
+          <p id="protocol-text">出现掉电信号时，不开主工程，只接一个接口。</p>
+        </div>
+        <div class="signal-box">
+          <h3>掉电信号</h3>
+          <ul id="signals-list"></ul>
+        </div>
+      </section>
+
+      <section class="grid" id="channel-grid"></section>
+
+      <section class="card drops-card">
+        <h2>投喂口</h2>
+        <p>
+          这里预留给后续的“预制未知”。仓库里的 <code>drops/</code> 可以持续增加碎片，前端后续可继续接入展示。
+        </p>
+        <div class="hint">
+          <span>当前阶段：</span>
+          <strong>静态面板已接通，投喂接口已留口。</strong>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
