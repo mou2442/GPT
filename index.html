@@ -3,401 +3,170 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>古籍检索分流器 v0</title>
+    <title>GPT Repo Notice</title>
     <style>
       :root {
         color-scheme: light;
-        --bg: #f5f3ef;
-        --card: #fffdfa;
-        --text: #1f1f1f;
-        --muted: #68635b;
-        --line: #d8d1c7;
-        --accent: #5b4b3a;
-        --accent-soft: #efe6db;
+        --bg: #f4efe7;
+        --paper: rgba(255, 251, 245, 0.94);
+        --ink: #231d18;
+        --muted: #6d6258;
+        --line: rgba(95, 74, 55, 0.18);
+        --accent: #8a4b2a;
+        --accent-strong: #6d3316;
       }
 
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
+        min-height: 100vh;
+        font-family: "Georgia", "Times New Roman", "Songti SC", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(138, 75, 42, 0.14), transparent 34%),
+          radial-gradient(circle at bottom right, rgba(109, 51, 22, 0.14), transparent 28%),
+          linear-gradient(135deg, #f7f1e8, #efe4d7 58%, #e9ddd0);
       }
 
-      .wrap {
-        max-width: 920px;
-        margin: 0 auto;
-        padding: 32px 16px 56px;
-      }
-
-      .panel {
-        background: var(--card);
+      main {
+        width: min(880px, calc(100% - 32px));
+        margin: 48px auto;
+        padding: 32px;
         border: 1px solid var(--line);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 8px 24px rgba(31, 31, 31, 0.05);
+        border-radius: 28px;
+        background: var(--paper);
+        box-shadow: 0 18px 60px rgba(60, 42, 28, 0.12);
       }
 
-      h1, h2, h3, p { margin: 0; }
-      h1 { font-size: 28px; margin-bottom: 8px; }
-      .sub { color: var(--muted); margin-bottom: 20px; }
-      .stack { display: grid; gap: 16px; }
-      .row { display: grid; gap: 12px; }
-
-      @media (min-width: 760px) {
-        .row.two { grid-template-columns: 1fr 220px; align-items: start; }
-        .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      h1,
+      p {
+        margin: 0;
       }
 
-      label { font-size: 14px; color: var(--muted); display: block; margin-bottom: 8px; }
-
-      textarea, select {
-        width: 100%;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 12px 14px;
-        font: inherit;
-        background: #fff;
-        color: var(--text);
-      }
-
-      textarea { min-height: 96px; resize: vertical; }
-
-      .btns, .example-list, .search-list { display: flex; flex-wrap: wrap; gap: 10px; }
-      button {
-        border: 1px solid var(--line);
-        background: #fff;
-        color: var(--text);
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 6px 12px;
         border-radius: 999px;
-        padding: 9px 14px;
-        cursor: pointer;
-        font: inherit;
-      }
-      button:hover { border-color: var(--accent); }
-      .primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-      .ghost { background: var(--accent-soft); }
-
-      .grid { display: grid; gap: 16px; }
-      .card {
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 16px;
-        background: #fff;
-      }
-      .title { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
-      .value { font-size: 18px; font-weight: 700; }
-      .tag {
-        display: inline-flex;
-        background: var(--accent-soft);
-        color: var(--accent);
-        border-radius: 999px;
-        padding: 4px 10px;
+        background: rgba(138, 75, 42, 0.12);
+        color: var(--accent-strong);
         font-size: 13px;
-        margin: 0 8px 8px 0;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
-      ul { margin: 0; padding-left: 20px; }
-      li + li { margin-top: 8px; }
-      .search-item {
+
+      h1 {
+        font-size: clamp(32px, 6vw, 54px);
+        line-height: 1.04;
+        margin-bottom: 16px;
+      }
+
+      .lead {
+        max-width: 680px;
+        font-size: 18px;
+        line-height: 1.8;
+        color: var(--muted);
+      }
+
+      .grid {
         display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-        align-items: start;
-        border: 1px dashed var(--line);
-        border-radius: 12px;
-        padding: 12px;
-        background: #fffdfa;
+        gap: 18px;
+        margin-top: 28px;
       }
-      .search-text {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        word-break: break-all;
+
+      .card {
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
       }
-      .footnote { color: var(--muted); font-size: 13px; }
+
+      .card h2 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+
+      .card p {
+        color: var(--muted);
+        line-height: 1.75;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 18px;
+        border-radius: 999px;
+        text-decoration: none;
+        color: white;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      }
+
+      a.link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 48px;
+        padding: 0 8px;
+        color: var(--accent-strong);
+        text-decoration: none;
+      }
+
+      code {
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: rgba(138, 75, 42, 0.09);
+        font-family: "Cascadia Code", "Consolas", monospace;
+        font-size: 0.95em;
+      }
+
+      @media (min-width: 720px) {
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
     </style>
   </head>
   <body>
-    <main class="wrap">
-      <section class="panel stack">
-        <div>
-          <h1>古籍检索分流器 v0</h1>
-          <p class="sub">本地规则判断 + 检索式生成。不接入真实搜索 API，不联网抓取。</p>
-        </div>
+    <main>
+      <div class="eyebrow">Repository Notice</div>
+      <h1>AV Constraint Translator has moved.</h1>
+      <p class="lead">
+        The translator grew out of this temporary multi-tool repo and now lives in its own dedicated
+        home. This repo stays behind as a light landing page and migration note.
+      </p>
 
-        <div class="row two">
-          <div>
-            <label for="queryInput">输入关键词</label>
-            <textarea id="queryInput" placeholder="例如：集成曲谱 玉簪记"></textarea>
-          </div>
-          <div>
-            <label for="intentSelect">意图选择器</label>
-            <select id="intentSelect">
-              <option value="auto">自动判定</option>
-              <option value="concept">概念层</option>
-              <option value="file">文件层</option>
-              <option value="content">内容层</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="stack">
-          <div>
-            <label>示例输入</label>
-            <div class="example-list" id="exampleList"></div>
-          </div>
-          <div class="btns">
-            <button class="primary" id="analyzeBtn">开始分流</button>
-            <button class="ghost" id="clearBtn">清空</button>
-          </div>
-        </div>
+      <section class="grid">
+        <article class="card">
+          <h2>New Repository</h2>
+          <p>
+            Source, templates, cases, and continued iteration now live at
+            <code>mou2442/cue-weaver</code>.
+          </p>
+        </article>
+        <article class="card">
+          <h2>What Changed</h2>
+          <p>
+            The former tool folder was split out so the translator can evolve independently instead of
+            sharing a temporary container repo with unrelated experiments.
+          </p>
+        </article>
       </section>
 
-      <section class="stack" style="margin-top: 20px;" id="resultSection">
-        <div class="grid">
-          <div class="card">
-            <div class="title">系统判定</div>
-            <div class="value" id="judgement">—</div>
-          </div>
-          <div class="card">
-            <div class="title">推荐路径</div>
-            <div class="value" id="pathText">—</div>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="card">
-            <div class="title">拆词结果</div>
-            <div id="tokens">—</div>
-          </div>
-          <div class="card">
-            <div class="title">判定理由</div>
-            <ul id="reasons"><li>—</li></ul>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="title">推荐检索式</div>
-          <div class="search-list" id="searchList"></div>
-        </div>
-
-        <div class="card">
-          <div class="title">常见坑</div>
-          <ul id="pitfalls"></ul>
-        </div>
-
-        <p class="footnote">说明：规则优先体现“大书名 + 小作品名”→ 内容层；含“pdf / 下载 / 全文 / 第X卷 / 第X册”→ 文件层；含“是什么 / 谁编的 / 哪朝 / 有几卷”→ 概念层。</p>
-      </section>
+      <div class="actions">
+        <a class="button" href="https://github.com/mou2442/cue-weaver">Open cue-weaver</a>
+        <a class="link" href="https://github.com/mou2442/GPT">View old repo history</a>
+      </div>
     </main>
-
-    <script>
-      // 预置示例，便于后续扩展为更多模板。
-      const examples = [
-        '集成曲谱 玉簪记',
-        '玉簪记 琴挑',
-        '纳书楹曲谱 长生殿 pdf',
-        '九宫正始 是什么'
-      ];
-
-      const layerMeta = {
-        concept: {
-          label: '概念层',
-          path: '先确认对象定义、版本、编者、时代与卷册信息，再进入下一步检索。',
-          pitfalls: [
-            '只问书名不问版本，容易把同名异书混在一起。',
-            '把“是什么”类问题直接当全文下载题，会浪费时间。',
-            '未先确认编者、朝代、卷数，后续检索式容易过宽。'
-          ]
-        },
-        file: {
-          label: '文件层',
-          path: '优先找可下载或可打开的载体文件，再核对版本与卷册。',
-          pitfalls: [
-            '只搜“pdf”不加书名全称，常出现无关结果。',
-            '“全文”结果未必是原书扫描件，可能只是节录。',
-            '卷、册、部信息缺失时，容易下载错文件。'
-          ]
-        },
-        content: {
-          label: '内容层',
-          path: '围绕具体篇目、出目、曲牌、折目或段落内容做精确检索。',
-          pitfalls: [
-            '只搜大书名，结果会停留在整书层面，定位不到具体内容。',
-            '小作品名可能有异名、简称，建议同时准备别名检索。',
-            '把篇章内容题误判为文件题，会得到很多下载页而非正文。'
-          ]
-        }
-      };
-
-      const bigTitleHints = ['曲谱', '集成', '总集', '文库', '丛刊', '全书', '选', '汇编'];
-      const conceptMarkers = ['是什么', '谁编的', '哪朝', '有几卷'];
-      const fileMarkers = ['pdf', '下载', '全文'];
-
-      function splitQuery(input) {
-        return input
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean);
-      }
-
-      function hasVolumeMarker(input) {
-        return /第[一二三四五六七八九十百千万\d]+[卷册]/.test(input);
-      }
-
-      function detectLayer(input, manualIntent) {
-        const text = input.trim();
-        const tokens = splitQuery(text);
-        const reasons = [];
-
-        if (!text) {
-          return {
-            layer: 'concept',
-            tokens: [],
-            reasons: ['输入为空，默认展示概念层说明。']
-          };
-        }
-
-        if (manualIntent !== 'auto') {
-          reasons.push(`已使用手动意图：${layerMeta[manualIntent].label}。`);
-          return { layer: manualIntent, tokens, reasons };
-        }
-
-        const conceptHit = conceptMarkers.find((item) => text.includes(item));
-        const fileHit = fileMarkers.find((item) => text.toLowerCase().includes(item));
-        const volumeHit = hasVolumeMarker(text);
-        const hasBigPlusSmall = tokens.length >= 2 && (bigTitleHints.some((item) => tokens[0].includes(item)) || bigTitleHints.some((item) => text.includes(item))) && tokens[1].length >= 2;
-
-        if (hasBigPlusSmall) {
-          reasons.push('命中“大书名 + 小作品名”规则，优先判为内容层。');
-          if (fileHit || volumeHit) {
-            reasons.push('虽然同时出现文件线索，但内容定位优先级更高，建议先定篇目再找载体。');
-          }
-          return { layer: 'content', tokens, reasons };
-        }
-
-        if (fileHit || volumeHit) {
-          reasons.push(`命中文件线索：${fileHit || '第X卷/第X册'}。`);
-          reasons.push('该类查询通常在寻找可打开、可下载或指定卷册的文件。');
-          return { layer: 'file', tokens, reasons };
-        }
-
-        if (conceptHit) {
-          reasons.push(`命中概念线索：${conceptHit}。`);
-          reasons.push('该类查询更适合先确认定义、编者、时代或卷数。');
-          return { layer: 'concept', tokens, reasons };
-        }
-
-        if (tokens.length >= 2) {
-          reasons.push('查询中包含多个词，且更像在定位具体篇目或段落。');
-          return { layer: 'content', tokens, reasons };
-        }
-
-        reasons.push('未命中强规则，默认先走概念层，缩小对象范围。');
-        return { layer: 'concept', tokens, reasons };
-      }
-
-      function buildQueries(input, layer, tokens) {
-        const joined = tokens.join(' ');
-        const exact = tokens.map((token) => `"${token}"`).join(' ');
-
-        if (layer === 'concept') {
-          return [
-            `${exact} 是什么`,
-            `${joined} 谁编的 哪朝 有几卷`,
-            `${joined} 版本 编者 卷数`
-          ];
-        }
-
-        if (layer === 'file') {
-          return [
-            `${exact} pdf`,
-            `${joined} 全文 下载`,
-            `${joined} 第1卷 pdf 版本`
-          ];
-        }
-
-        return [
-          `${exact} 正文`,
-          `${joined} 曲牌 出目`,
-          `${joined} 折目 段落`
-        ];
-      }
-
-      function renderResult() {
-        const input = document.getElementById('queryInput').value;
-        const manualIntent = document.getElementById('intentSelect').value;
-        const result = detectLayer(input, manualIntent);
-        const meta = layerMeta[result.layer];
-        const searches = buildQueries(input, result.layer, result.tokens);
-
-        document.getElementById('judgement').textContent = meta.label;
-        document.getElementById('pathText').textContent = meta.path;
-
-        const tokenBox = document.getElementById('tokens');
-        tokenBox.innerHTML = result.tokens.length
-          ? result.tokens.map((token) => `<span class="tag">${token}</span>`).join('')
-          : '—';
-
-        document.getElementById('reasons').innerHTML = result.reasons
-          .map((reason) => `<li>${reason}</li>`)
-          .join('');
-
-        const searchList = document.getElementById('searchList');
-        searchList.innerHTML = searches
-          .map((text, index) => `
-            <div class="search-item">
-              <div class="search-text">${index + 1}. ${text}</div>
-              <button data-copy="${text.replace(/"/g, '&quot;')}">复制</button>
-            </div>
-          `)
-          .join('');
-
-        document.getElementById('pitfalls').innerHTML = meta.pitfalls
-          .map((item) => `<li>${item}</li>`)
-          .join('');
-      }
-
-      function bindExamples() {
-        const box = document.getElementById('exampleList');
-        box.innerHTML = examples
-          .map((example) => `<button type="button" data-example="${example}">${example}</button>`)
-          .join('');
-
-        box.addEventListener('click', (event) => {
-          const target = event.target;
-          if (target.matches('[data-example]')) {
-            document.getElementById('queryInput').value = target.getAttribute('data-example');
-            document.getElementById('intentSelect').value = 'auto';
-            renderResult();
-          }
-        });
-      }
-
-      function bindActions() {
-        document.getElementById('analyzeBtn').addEventListener('click', renderResult);
-        document.getElementById('clearBtn').addEventListener('click', () => {
-          document.getElementById('queryInput').value = '';
-          document.getElementById('intentSelect').value = 'auto';
-          renderResult();
-        });
-
-        document.getElementById('searchList').addEventListener('click', async (event) => {
-          const target = event.target;
-          if (!target.matches('[data-copy]')) return;
-          const text = target.getAttribute('data-copy');
-          try {
-            await navigator.clipboard.writeText(text);
-            target.textContent = '已复制';
-            setTimeout(() => { target.textContent = '复制'; }, 1200);
-          } catch {
-            target.textContent = '复制失败';
-            setTimeout(() => { target.textContent = '复制'; }, 1200);
-          }
-        });
-      }
-
-      bindExamples();
-      bindActions();
-      document.getElementById('queryInput').value = examples[0];
-      renderResult();
-    </script>
   </body>
 </html>
